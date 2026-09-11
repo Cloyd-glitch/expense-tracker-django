@@ -86,7 +86,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         recent_expenses = Expense.objects.filter(user=user).select_related('category')[:5]
 
         # Week label e.g. "Sep 9 – Sep 15"
-        week_name = f"{week_start.strftime('%b %-d')} – {week_end.strftime('%b %-d, %Y')}"
+        week_name = f"{week_start.strftime('%b %#d')} – {week_end.strftime('%b %#d, %Y')}"
 
         ctx.update({
             'today': date.today(),
