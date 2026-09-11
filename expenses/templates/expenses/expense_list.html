@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Expenses{% endblock %}
+{% block meta_description %}Full expense history — filter by category, date range, and view totals.{% endblock %}
+{% block page_title %}Expense History{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'expense_add' %}" class="btn btn-primary" id="btn-add-expense-list">＋ Add Expense</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Filter bar -->
+<form method="get" class="filter-bar" id="filter-form">
+  <div class="form-group">
+    <label for="id_category_filter">Category</label>
+    <select name="category" id="id_category_filter">
+      <option value="">All</option>
+      {% for cat in categories %}
+      <option value="{{ cat.pk }}" {% if selected_cat == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="id_start">From</label>
+    <input type="date" name="start" id="id_start" value="{{ start }}" />
+  </div>
+  <div class="form-group">
+    <label for="id_end">To</label>
+    <input type="date" name="end" id="id_end" value="{{ end }}" />
+  </div>
+  <div class="flex gap-1 items-center" style="align-self:flex-end">
+    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+    <a href="{% url 'expense_list' %}" class="btn btn-secondary btn-sm">Clear</a>
+  </div>
+</form>
+
+{% if expenses %}
+<div class="flex items-center justify-between mb-2">
+  <p class="text-muted" style="font-size:.85rem">
+    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} expense{{ page_obj.paginator.count|pluralize }}
+    &nbsp;·&nbsp; <strong class="stat-accent">Total: ₱{{ total|floatformat:2 }}</strong>
+  </p>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Note</th>
+        <th style="text-align:right">Amount</th>
+        <th style="text-align:center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exp in expenses %}
+      <tr>
+        <td>{{ exp.date }}</td>
+        <td><span class="badge badge-default">{{ exp.category|default:"—" }}</span></td>
+        <td class="text-muted">{{ exp.note|default:"—" }}</td>
+        <td style="text-align:right;font-weight:600">₱{{ exp.amount|floatformat:2 }}</td>
+        <td style="text-align:center">
+          <div class="flex gap-1" style="justify-content:center">
+            <a href="{% url 'expense_edit' exp.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Edit">✏️</a>
+            <a href="{% url 'expense_delete' exp.pk %}" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav class="pagination" aria-label="Pagination">
+  {% if page_obj.has_previous %}
+  <div class="page-item"><a href="?page={{ page_obj.previous_page_number }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">‹</a></div>
+  {% endif %}
+  {% for num in page_obj.paginator.page_range %}
+  <div class="page-item {% if page_obj.number == num %}active{% endif %}">
+    {% if page_obj.number == num %}
+      <span>{{ num }}</span>
+    {% else %}
+      <a href="?page={{ num }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">{{ num }}</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% if page_obj.has_next %}
+  <div class="page-item"><a href="?page={{ page_obj.next_page_number }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">›</a></div>
+  {% endif %}
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">💳</div>
+  <p>No expenses found.</p>
+  <a href="{% url 'expense_add' %}" class="btn btn-primary">Add your first expense</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Delete Expense{% endblock %}
+{% block page_title %}Delete Expense{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+  <div class="delete-icon">🗑️</div>
+  <h2 style="font-size:1.1rem;margin-bottom:.5rem">Delete this expense?</h2>
+  <p>
+    <strong>{{ object.category|default:"Uncategorised" }}</strong> —
+    ₱{{ object.amount|floatformat:2 }} on {{ object.date }}<br/>
+    {% if object.note %}<em class="text-muted">{{ object.note }}</em>{% endif %}
+  </p>
+  <form method="post" class="delete-actions" id="delete-expense-form">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+    <a href="{% url 'expense_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

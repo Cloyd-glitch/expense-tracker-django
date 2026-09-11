@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Categories{% endblock %}
+{% block meta_description %}Manage your spending categories.{% endblock %}
+{% block page_title %}Categories{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'category_add' %}" class="btn btn-primary" id="btn-add-category">＋ New Category</a>
+{% endblock %}
+
+{% block content %}
+{% if categories %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="text-align:center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cat in categories %}
+      <tr>
+        <td><span class="badge badge-default">{{ cat.name }}</span></td>
+        <td style="text-align:center">
+          <div class="flex gap-1" style="justify-content:center">
+            <a href="{% url 'category_edit' cat.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Edit">✏️</a>
+            <a href="{% url 'category_delete' cat.pk %}" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">🏷️</div>
+  <p>No categories yet. Create one to start organising your expenses.</p>
+  <a href="{% url 'category_add' %}" class="btn btn-primary">Create Category</a>
+</div>
+{% endif %}
+{% endblock %}

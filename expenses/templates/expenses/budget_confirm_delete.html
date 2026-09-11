@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Remove Budget{% endblock %}
+{% block page_title %}Remove Budget{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+  <div class="delete-icon">🗑️</div>
+  <h2 style="font-size:1.1rem;margin-bottom:.5rem">Remove budget for "{{ object.category.name }}"?</h2>
+  <p>Monthly limit of ₱{{ object.monthly_limit|floatformat:2 }} will be removed.</p>
+  <form method="post" class="delete-actions" id="delete-budget-form">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, remove</button>
+    <a href="{% url 'budget_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

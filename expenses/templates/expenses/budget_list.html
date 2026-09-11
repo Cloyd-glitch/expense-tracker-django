@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Budgets{% endblock %}
+{% block meta_description %}Set monthly spending limits per category and track your budget.{% endblock %}
+{% block page_title %}Monthly Budgets{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'budget_add' %}" class="btn btn-primary" id="btn-add-budget">＋ Set Budget</a>
+{% endblock %}
+
+{% block content %}
+{% if budgets %}
+<div class="grid-2">
+  {% for b in budgets %}
+  <div class="card">
+    <div class="flex items-center justify-between mb-2">
+      <p class="card-title" style="margin:0">{{ b.category.name }}</p>
+      <div class="flex gap-1">
+        <a href="{% url 'budget_edit' b.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Edit">✏️</a>
+        <a href="{% url 'budget_delete' b.pk %}" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</a>
+      </div>
+    </div>
+    <p class="card-value {% if b.over_budget %}text-danger{% else %}stat-accent{% endif %}">
+      ₱{{ b.spent|floatformat:2 }}
+    </p>
+    <p class="card-sub">of ₱{{ b.monthly_limit|floatformat:2 }} limit</p>
+    <div class="progress-wrap mt-1">
+      <div class="progress-bar {% if b.over_budget %}over{% elif b.pct >= 80 %}warning{% else %}ok{% endif %}"
+           style="width: {{ b.pct }}%"></div>
+    </div>
+    <div class="flex items-center justify-between mt-1">
+      <small class="text-muted">{{ b.pct }}% used</small>
+      {% if b.over_budget %}
+        <span class="badge badge-danger">⚠ Over budget</span>
+      {% elif b.pct >= 80 %}
+        <span class="badge badge-warning">Near limit</span>
+      {% else %}
+        <span class="badge badge-success">On track</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">🎯</div>
+  <p>No budgets set yet. Set a monthly limit per category to track overspending.</p>
+  <a href="{% url 'budget_add' %}" class="btn btn-primary">Set your first budget</a>
+</div>
+{% endif %}
+{% endblock %}

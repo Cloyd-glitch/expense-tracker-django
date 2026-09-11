@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block meta_description %}Create your free FinTrack account.{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <div class="auth-logo">
+    <span class="brand-icon">💸</span>
+    <h2>Create Account</h2>
+  </div>
+  <p class="auth-sub">Start tracking your expenses today.</p>
+
+  <form method="post" id="signup-form">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+      {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary w-full mt-2">Create Account</button>
+  </form>
+
+  <p class="auth-footer">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</div>
+{% endblock %}

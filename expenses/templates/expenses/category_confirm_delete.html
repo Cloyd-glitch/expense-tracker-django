@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Delete Category{% endblock %}
+{% block page_title %}Delete Category{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+  <div class="delete-icon">🗑️</div>
+  <h2 style="font-size:1.1rem;margin-bottom:.5rem">Delete "{{ object.name }}"?</h2>
+  <p>Expenses in this category will have their category set to <em>None</em>.</p>
+  <form method="post" class="delete-actions" id="delete-category-form">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+    <a href="{% url 'category_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}
