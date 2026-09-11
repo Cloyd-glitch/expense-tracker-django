@@ -42,7 +42,7 @@ class CategoryForm(forms.ModelForm):
 class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
-        fields = ('category', 'monthly_limit')
+        fields = ('category', 'weekly_limit')
 
     def __init__(self, user=None, *args, **kwargs):
         self.user = user

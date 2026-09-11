@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Budgets{% endblock %}
-{% block meta_description %}Set monthly spending limits per category and track your budget.{% endblock %}
-{% block page_title %}Monthly Budgets{% endblock %}
+{% block meta_description %}Set weekly spending limits per category and track your budget.{% endblock %}
+{% block page_title %}Weekly Budgets{% endblock %}
 
 {% block topbar_actions %}
 <a href="{% url 'budget_add' %}" class="btn btn-primary" id="btn-add-budget">＋ Set Budget</a>
@@ -22,7 +22,7 @@
     <p class="card-value {% if b.over_budget %}text-danger{% else %}stat-accent{% endif %}">
       ₱{{ b.spent|floatformat:2 }}
     </p>
-    <p class="card-sub">of ₱{{ b.monthly_limit|floatformat:2 }} limit</p>
+    <p class="card-sub">of ₱{{ b.weekly_limit|floatformat:2 }} limit</p>
     <div class="progress-wrap mt-1">
       <div class="progress-bar {% if b.over_budget %}over{% elif b.pct >= 80 %}warning{% else %}ok{% endif %}"
            style="width: {{ b.pct }}%"></div>
@@ -43,7 +43,7 @@
 {% else %}
 <div class="empty-state">
   <div class="empty-icon">🎯</div>
-  <p>No budgets set yet. Set a monthly limit per category to track overspending.</p>
+  <p>No budgets set yet. Set a weekly limit per category to track overspending.</p>
   <a href="{% url 'budget_add' %}" class="btn btn-primary">Set your first budget</a>
 </div>
 {% endif %}

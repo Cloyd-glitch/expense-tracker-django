@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -10,6 +10,14 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView, DeleteView, ListView, TemplateView, UpdateView,
 )
+
+
+def get_current_week_range():
+    """Return (week_start, week_end) for the current ISO week (Mon–Sun)."""
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())  # Monday
+    week_end = week_start + timedelta(days=6)             # Sunday
+    return week_start, week_end
 
 from .forms import BudgetForm, CategoryForm, ExpenseForm, SignUpForm
 from .models import Budget, Category, Expense
@@ -36,26 +44,25 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         user = self.request.user
-        today = date.today()
-        year, month = today.year, today.month
+        week_start, week_end = get_current_week_range()
 
-        # Current month expenses
-        monthly_qs = Expense.objects.filter(
-            user=user, date__year=year, date__month=month
+        # Current week expenses
+        weekly_qs = Expense.objects.filter(
+            user=user, date__gte=week_start, date__lte=week_end
         )
-        total_this_month = monthly_qs.aggregate(total=Sum('amount'))['total'] or 0
+        total_this_week = weekly_qs.aggregate(total=Sum('amount'))['total'] or 0
 
-        # Category breakdown for current month
+        # Category breakdown for current week
         breakdown = list(
-            monthly_qs
+            weekly_qs
             .values('category__name', 'category__id')
             .annotate(total=Sum('amount'))
             .order_by('-total')
         )
 
-        # Budget map {category_id: monthly_limit}
+        # Budget map {category_id: weekly_limit}
         budgets = {
-            b.category_id: b.monthly_limit
+            b.category_id: b.weekly_limit
             for b in Budget.objects.filter(user=user)
         }
 
@@ -78,15 +85,18 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Recent 5 expenses
         recent_expenses = Expense.objects.filter(user=user).select_related('category')[:5]
 
+        # Week label e.g. "Sep 9 – Sep 15"
+        week_name = f"{week_start.strftime('%b %-d')} – {week_end.strftime('%b %-d, %Y')}"
+
         ctx.update({
-            'today': today,
-            'total_this_month': total_this_month,
+            'today': date.today(),
+            'total_this_week': total_this_week,
             'breakdown': breakdown,
             'over_budget_count': sum(1 for r in breakdown if r['over_budget']),
             'chart_labels': json.dumps(chart_labels),
             'chart_data': json.dumps(chart_data),
             'recent_expenses': recent_expenses,
-            'month_name': today.strftime('%B %Y'),
+            'week_name': week_name,
         })
         return ctx
 
@@ -217,21 +227,21 @@ class BudgetListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         user = self.request.user
-        today = date.today()
+        week_start, week_end = get_current_week_range()
 
-        # Annotate each budget with this month's actual spending
-        monthly_totals = {
+        # Annotate each budget with this week's actual spending
+        weekly_totals = {
             row['category_id']: row['total']
             for row in Expense.objects.filter(
-                user=user, date__year=today.year, date__month=today.month
+                user=user, date__gte=week_start, date__lte=week_end
             ).values('category_id').annotate(total=Sum('amount'))
         }
 
         for b in ctx['budgets']:
-            spent = monthly_totals.get(b.category_id, 0)
+            spent = weekly_totals.get(b.category_id, 0)
             b.spent = spent
-            b.over_budget = spent > b.monthly_limit
-            b.pct = min(int((spent / b.monthly_limit) * 100), 100) if b.monthly_limit else 0
+            b.over_budget = spent > b.weekly_limit
+            b.pct = min(int((spent / b.weekly_limit) * 100), 100) if b.weekly_limit else 0
 
         return ctx
 

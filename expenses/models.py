@@ -37,17 +37,17 @@ class Expense(models.Model):
 
 
 class Budget(models.Model):
-    """Optional: a monthly spending limit per category, per user."""
+    """Optional: a weekly spending limit per category, per user."""
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="budgets"
     )
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="budgets"
     )
-    monthly_limit = models.DecimalField(max_digits=10, decimal_places=2)
+    weekly_limit = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         unique_together = ("user", "category")
 
     def __str__(self):
-        return f"{self.user} - {self.category}: {self.monthly_limit}/mo"
+        return f"{self.user} - {self.category}: {self.weekly_limit}/wk"

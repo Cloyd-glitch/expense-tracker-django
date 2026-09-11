@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
-{% block meta_description %}Your personal finance dashboard — monthly summary, category breakdown, and recent expenses.{% endblock %}
+{% block meta_description %}Your personal finance dashboard — weekly summary, category breakdown, and recent expenses.{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
 {% block topbar_actions %}
@@ -16,14 +16,14 @@
 <!-- Stat cards row -->
 <div class="grid-3 mb-2">
   <div class="card">
-    <p class="card-title">Total This Month</p>
-    <p class="card-value stat-accent">₱{{ total_this_month|floatformat:2 }}</p>
-    <p class="card-sub">{{ month_name }}</p>
+    <p class="card-title">Total This Week</p>
+    <p class="card-value stat-accent">₱{{ total_this_week|floatformat:2 }}</p>
+    <p class="card-sub">{{ week_name }}</p>
   </div>
   <div class="card">
     <p class="card-title">Categories</p>
     <p class="card-value">{{ breakdown|length }}</p>
-    <p class="card-sub">With spending this month</p>
+    <p class="card-sub">With spending this week</p>
   </div>
   <div class="card">
     <p class="card-title">Over Budget</p>
@@ -45,7 +45,7 @@
     {% else %}
     <div class="empty-state">
       <div class="empty-icon">📊</div>
-      <p>No expenses logged this month.</p>
+      <p>No expenses logged this week.</p>
       <a href="{% url 'expense_add' %}" class="btn btn-primary">Add your first expense</a>
     </div>
     {% endif %}
@@ -74,7 +74,7 @@
       </div>
       {% endfor %}
     {% else %}
-      <p class="text-muted" style="padding:.75rem 0">Nothing spent this month.</p>
+      <p class="text-muted" style="padding:.75rem 0">Nothing spent this week.</p>
     {% endif %}
   </div>
 
