@@ -112,22 +112,20 @@ class ExpenseListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = Expense.objects.filter(user=self.request.user).select_related('category')
         cat = self.request.GET.get('category')
-        start = self.request.GET.get('start')
-        end = self.request.GET.get('end')
+        period = self.request.GET.get('period')
         if cat:
             qs = qs.filter(category_id=cat)
-        if start:
-            qs = qs.filter(date__gte=start)
-        if end:
-            qs = qs.filter(date__lte=end)
+        if period and period.isdigit():
+            days = int(period)
+            cutoff = date.today() - timedelta(days=days - 1)
+            qs = qs.filter(date__gte=cutoff)
         return qs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['categories'] = Category.objects.all().order_by('name')
         ctx['selected_cat'] = self.request.GET.get('category', '')
-        ctx['start'] = self.request.GET.get('start', '')
-        ctx['end'] = self.request.GET.get('end', '')
+        ctx['selected_period'] = self.request.GET.get('period', '')
         ctx['total'] = self.get_queryset().aggregate(t=Sum('amount'))['t'] or 0
         return ctx
 

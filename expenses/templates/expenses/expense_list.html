@@ -21,12 +21,17 @@
     </select>
   </div>
   <div class="form-group">
-    <label for="id_start">From</label>
-    <input type="date" name="start" id="id_start" value="{{ start }}" />
-  </div>
-  <div class="form-group">
-    <label for="id_end">To</label>
-    <input type="date" name="end" id="id_end" value="{{ end }}" />
+    <label for="id_period">Period</label>
+    <select name="period" id="id_period" onchange="this.form.submit()">
+      <option value=""      {% if selected_period == ""    %}selected{% endif %}>All time</option>
+      <option value="1"     {% if selected_period == "1"   %}selected{% endif %}>Today</option>
+      <option value="3"     {% if selected_period == "3"   %}selected{% endif %}>Last 3 days</option>
+      <option value="7"     {% if selected_period == "7"   %}selected{% endif %}>Last 7 days</option>
+      <option value="30"    {% if selected_period == "30"  %}selected{% endif %}>Last 30 days</option>
+      <option value="90"    {% if selected_period == "90"  %}selected{% endif %}>Last 90 days</option>
+      <option value="180"   {% if selected_period == "180" %}selected{% endif %}>Last 6 months</option>
+      <option value="365"   {% if selected_period == "365" %}selected{% endif %}>Last 1 year</option>
+    </select>
   </div>
   <div class="flex gap-1 items-center" style="align-self:flex-end">
     <button type="submit" class="btn btn-primary btn-sm">Filter</button>
@@ -75,19 +80,19 @@
 {% if is_paginated %}
 <nav class="pagination" aria-label="Pagination">
   {% if page_obj.has_previous %}
-  <div class="page-item"><a href="?page={{ page_obj.previous_page_number }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">‹</a></div>
+  <div class="page-item"><a href="?page={{ page_obj.previous_page_number }}&category={{ selected_cat }}&period={{ selected_period }}">‹</a></div>
   {% endif %}
   {% for num in page_obj.paginator.page_range %}
   <div class="page-item {% if page_obj.number == num %}active{% endif %}">
     {% if page_obj.number == num %}
       <span>{{ num }}</span>
     {% else %}
-      <a href="?page={{ num }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">{{ num }}</a>
+      <a href="?page={{ num }}&category={{ selected_cat }}&period={{ selected_period }}">{{ num }}</a>
     {% endif %}
   </div>
   {% endfor %}
   {% if page_obj.has_next %}
-  <div class="page-item"><a href="?page={{ page_obj.next_page_number }}&category={{ selected_cat }}&start={{ start }}&end={{ end }}">›</a></div>
+  <div class="page-item"><a href="?page={{ page_obj.next_page_number }}&category={{ selected_cat }}&period={{ selected_period }}">›</a></div>
   {% endif %}
 </nav>
 {% endif %}
